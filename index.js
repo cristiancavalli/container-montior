@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const logger = require('koa-logger');
 const route = require('koa-route');
 const parse = require('co-body');
@@ -21,7 +22,7 @@ function *checkAuth (next) {
     this.status = 400;
     return yield next;
   }
-  console.log('here is the payload', payload);
+  console.log('here is the payload', process.env.SIGNATURE_KEY);
   const msg = payload.pull_request;
   const remoteSignature = this.request.headers['x-hub-signature'];
   const localSignature = crypto.createHmac('sha1', process.env.SIGNATURE_KEY)
