@@ -47,7 +47,7 @@ function *checkAuth (next) {
   this.body = 'ack';
 }
 
-app.listen(80, function () {
+app.listen(8080, function () {
   console.log('Server started @', (new Date).toLocaleString(), 
     -(new  Date).getTimezoneOffset()/60);
 });
