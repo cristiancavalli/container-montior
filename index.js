@@ -15,9 +15,34 @@ app.use(route.get('/ping', function *() {
 }));
 app.use(route.post('/hook', checkAuth));
 
-function *checkAuth () {
+function *checkAuth (next) {
   var payload = yield parse(this);
+  if (!payload) {
+    this.status = 400;
+    return yield next;
+  }
   console.log('here is the payload', payload);
+  const msg = payload.pull_request;
+  const remoteSignature = this.request.headers['x-hub-signature'];
+  const localSignature = crypto.createHmac('sha1', process.env.SIGNATURE_KEY)
+    .update(JSON.stringify(payload)).digest('hex');
+  const info = {
+    repo: { 
+      name: msg.head
+    },
+    head: {
+      repo_name: msg.head.repo.name,
+      ref: msg.head.ref,
+      user: msg.head.user.login
+    },
+    url: [
+      'git://github.com', msg.head.user.login, 
+      msg.head.repo.name+'#'+msg.head.ref
+    ].join('/')
+  };
+  console.log('SIGNATURES', 'remote:', remoteSignature, 'local:', localSignature);
+  console.log('Here is info');
+  console.log(o);
   this.body = 'ack';
 }
 
