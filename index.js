@@ -56,7 +56,7 @@ function *checkAuth (next) {
   setImmediate(() => beginDeploy(info.url, msg.url));
 }
 
-app.listen(80, function () {
+app.listen(8080, function () {
   console.log('Server started @', (new Date).toLocaleString(), 
     -(new  Date).getTimezoneOffset()/60);
 });
