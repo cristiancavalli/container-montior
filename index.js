@@ -33,9 +33,17 @@ function *checkAuth (next) {
     return yield next;
   }
   const msg = payload.pull_request;
-  const remoteSignature = this.request.headers['x-hub-signature'];
+  const remoteSignature = this.request.headers['x-hub-signature']
+    .replace('sha1=', '');
   const localSignature = crypto.createHmac('sha1', process.env.SIGNATURE_KEY)
     .update(JSON.stringify(payload)).digest('hex');
+  console.log('SIGNATURES', '\n\t',
+    'remote:', remoteSignature, '\n\t', 'local:', localSignature);
+  if (remoteSignature !== localSignature) {
+    console.log('Rejecting request since tokens did not match');
+    this.status = 400;
+    return yield next;
+  }
   const info = {
     repo: { 
       name: msg.head
@@ -50,7 +58,6 @@ function *checkAuth (next) {
       msg.head.repo.name+'#'+msg.head.ref
     ].join('/')
   };
-  console.log('SIGNATURES', 'remote:', remoteSignature, 'local:', localSignature);
   console.log(info);
   this.body = 'ack';
   setImmediate(() => beginDeploy(info.url, msg.url));

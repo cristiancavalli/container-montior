@@ -24,7 +24,7 @@ function deployImage (config) {
             console.log('########################');
             console.log('#### IMAGE DEPLOYED ####');
             console.log('########################');
-            resolve(merge(clusterInfo, {
+            resolve(merge(config, {
               image: {
                 run: output
               }
