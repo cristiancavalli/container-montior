@@ -2,7 +2,7 @@ const spawn = require('child_process').spawn;
 const randomWord = require('random-word');
 const merge = require('lodash.merge');
 const kubectl = process.env.KUBECTL;
-const image = 'us.gcr.io/ccavalli-test-me/node-7-googleauth-test:latest';
+const image = 'us.gcr.io/goog-auth-int-test/node-7-googleauth-test:latest';
 
 function deployImage (config) {
   console.log('#########################');

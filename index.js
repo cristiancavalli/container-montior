@@ -8,9 +8,8 @@ const deployImage = require('./deployImage');
 const exposeDeployment = require('./exposeDeployment');
 
 function beginDeploy (upstream, prUrl) {
-  createCluster({request: {upstream: upstream, prUrl: prUrl}})
+  return createCluster({request: {upstream: upstream, prUrl: prUrl}})
     .then(deployImage)
-    .then(exposeDeployment)
     .then((res) => console.log('Completed!\n', res))
     .catch((e) => console.error(e));
 }
@@ -54,7 +53,7 @@ function *checkAuth (next) {
   console.log('SIGNATURES', 'remote:', remoteSignature, 'local:', localSignature);
   console.log(info);
   this.body = 'ack';
-  setImmediate(beginDeploy.bind(null, info.url, msg.url));
+  setImmediate(() => beginDeploy(info.url, msg.url));
 }
 
 app.listen(80, function () {
