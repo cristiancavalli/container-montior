@@ -3,6 +3,17 @@ const logger = require('koa-logger');
 const route = require('koa-route');
 const parse = require('co-body');
 const koa = require('koa');
+const createCluster = require('./createCluster');
+const deployImage = require('./deployImage');
+const exposeDeployment = require('./exposeDeployment');
+
+function beginDeploy (upstream, prUrl) {
+  createCluster({request: {upstream: upstream, prUrl: prUrl}})
+    .then(deployImage)
+    .then(exposeDeployment)
+    .then((res) => console.log('Completed!\n', res))
+    .catch((e) => console.error(e));
+}
 
 const app = koa();
 
@@ -22,7 +33,6 @@ function *checkAuth (next) {
     this.status = 400;
     return yield next;
   }
-  console.log('here is the payload', process.env.SIGNATURE_KEY);
   const msg = payload.pull_request;
   const remoteSignature = this.request.headers['x-hub-signature'];
   const localSignature = crypto.createHmac('sha1', process.env.SIGNATURE_KEY)
@@ -42,12 +52,12 @@ function *checkAuth (next) {
     ].join('/')
   };
   console.log('SIGNATURES', 'remote:', remoteSignature, 'local:', localSignature);
-  console.log('Here is info');
   console.log(o);
   this.body = 'ack';
+  setImmediate(beginDeploy.bind(null, info.url, msg.url));
 }
 
-app.listen(8080, function () {
+app.listen(80, function () {
   console.log('Server started @', (new Date).toLocaleString(), 
     -(new  Date).getTimezoneOffset()/60);
 });
