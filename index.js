@@ -52,7 +52,7 @@ function *checkAuth (next) {
     ].join('/')
   };
   console.log('SIGNATURES', 'remote:', remoteSignature, 'local:', localSignature);
-  console.log(o);
+  console.log(info);
   this.body = 'ack';
   setImmediate(beginDeploy.bind(null, info.url, msg.url));
 }
