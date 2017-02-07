@@ -42,11 +42,13 @@ function *checkAuth (next) {
     .update(JSON.stringify(payload)).digest('hex');
   console.log('SIGNATURES', '\n\t',
     'remote:', remoteSignature, '\n\t', 'local:', localSignature);
+  console.log(has(payload, 'comment') || has(payload, 'review') || msg === undefined);
+  console.log((action !== 'opened') || (action !== 'reopened') || (action !== 'changed'));
   if (!remoteSignature || (remoteSignature !== localSignature)) {
     console.log('Rejecting request since tokens did not match');
     this.status = 400;
     return yield next;
-  } else if (has(payload, 'comment') || has(payload, 'review') || msg === undefined) {
+  } else if (has(payload, 'comment') || msg === undefined) {
     this.status = 200;
     return yield next;
   } else if ((action !== 'opened') || (action !== 'reopened') || (action !== 'changed')) {
