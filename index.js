@@ -35,6 +35,7 @@ function *checkAuth (next) {
   }
   const msg = payload.pull_request;
   const action = payload.action;
+  console.log('here is the action', action);
   const remoteSignature = this.request.headers['x-hub-signature']
     .replace('sha1=', '');
   const localSignature = crypto.createHmac('sha1', process.env.SIGNATURE_KEY)
@@ -45,10 +46,10 @@ function *checkAuth (next) {
     console.log('Rejecting request since tokens did not match');
     this.status = 400;
     return yield next;
-  } else if (has(payload, 'comment') || has(payload, 'review') || !msg) {
+  } else if (has(payload, 'comment') || has(payload, 'review') || msg === undefined) {
     this.status = 200;
     return yield next;
-  } else if ((action !== 'opened') || (action !== 'changed')) {
+  } else if ((action !== 'opened') || (action !== 'reopened') || (action !== 'changed')) {
     this.status = 200;
     return yield next;
   }
